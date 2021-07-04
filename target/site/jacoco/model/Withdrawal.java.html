@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Withdrawal.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MavenATMv2</a> &gt; <a href="index.source.html" class="el_package">model</a> &gt; <span class="el_source">Withdrawal.java</span></div><h1>Withdrawal.java</h1><pre class="source lang-java linenums">package model;
+
+//import view.Keypad;
+//import view.Screen;
+import static model.Constants.*;
+
+// Withdrawal.java
+// Represents a withdrawal ATM transaction
+
+public class Withdrawal extends Transaction {
+   private int amount; // amount to withdraw
+   //private Keypad keypad; // reference to keypad
+   private CashDispenser cashDispenser; // reference to cash dispenser
+
+   // Withdrawal constructor
+   public Withdrawal(int userAccountNumber, /*Screen atmScreen,*/ 
+      BankDatabase atmBankDatabase, /*Keypad atmKeypad,*/ CashDispenser atmCashDispenser) {
+
+      // initialize superclass variables
+<span class="fc" id="L20">      super(userAccountNumber, /*atmScreen,*/ atmBankDatabase);</span>
+      //keypad = atmKeypad;
+<span class="fc" id="L22">      cashDispenser = atmCashDispenser;</span>
+<span class="fc" id="L23">   }</span>
+
+   // perform transaction
+   @Override
+   public int execute() {
+	   BankDatabase bankDatabase;
+	   double availableBalance;
+<span class="fc" id="L30">	   int status = 0;</span>
+<span class="fc" id="L31">	   int idxamount = getAmount();</span>
+	   
+<span class="fc bfc" id="L33" title="All 2 branches covered.">	   if (idxamount != WITHDRAWAL_CANCELED) { // cek apakah idxamount bukan canceled (6) </span>
+		   // get bankdatabase akun
+<span class="fc" id="L35">		   bankDatabase = getBankDatabase();</span>
+<span class="fc" id="L36">		   availableBalance = bankDatabase.getAvailableBalance(getAccountNumber());</span>
+	   		      
+		   // lakukan proses pengambilan uang:
+		   // cek dulu range value amount dengan batasan limit value
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">		   if(!cashDispenser.isSufficientCashAvailable(idxamount)) { // V4</span>
+			   // cek dulu uang yang ada di dispenser ATM apakah masih ada?
+<span class="nc" id="L42">			   status = CASHDISPENSER_NOT_ENOUGH ;</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">		   }else if (!isBalanceEnoughWithdraw(availableBalance, idxamount)) { // cek saldo apakah masih mencukupi (V5)</span>
+<span class="fc" id="L44">			   status = BALANCE_NOT_ENOUGH;</span>
+		   }else {
+			   // a. Kurangi available balance dengan nominal uang yang diambil
+			   // b. kurangi total balance dengan nominal uang yang diambil
+			   // c. Kurangi cash dispenser amount
+<span class="fc" id="L49">			   bankDatabase.credit(getAccountNumber(), idxamount);</span>
+<span class="fc" id="L50">			   cashDispenser.dispenseCash(idxamount);</span>
+<span class="fc" id="L51">			   status = WITHDRAW_SUCCESSFUL;</span>
+		   }
+	   }else {
+<span class="fc" id="L54">		   status = WITHDRAWAL_CANCELED;</span>
+	   }
+	   
+<span class="fc" id="L57">	   return status;</span>
+   }
+   
+	public int getAmount() {
+<span class="fc" id="L61">		return amount;</span>
+	}
+	
+	public void setAmount(int amount) {
+<span class="fc" id="L65">		this.amount = amount;</span>
+<span class="fc" id="L66">	}</span>
+	
+	private boolean isBalanceEnoughWithdraw(double balance, int amount) {
+<span class="fc bfc" id="L69" title="All 2 branches covered.">		if ((balance-amount)&gt;= MIN_AMOUNT_BALANCE) {</span>
+<span class="fc" id="L70">			return true;</span>
+		}else {
+<span class="fc" id="L72">			return false;</span>
+		}
+	}
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

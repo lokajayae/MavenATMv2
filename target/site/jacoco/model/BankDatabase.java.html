@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BankDatabase.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MavenATMv2</a> &gt; <a href="index.source.html" class="el_package">model</a> &gt; <span class="el_source">BankDatabase.java</span></div><h1>BankDatabase.java</h1><pre class="source lang-java linenums">package model;
+
+import java.util.ArrayList;
+import static model.Constants.*;
+
+public class BankDatabase {
+	private ArrayList &lt;Account&gt; accounts; // array of Accounts
+   
+<span class="fc" id="L9">   public BankDatabase() {</span>
+<span class="fc" id="L10">      accounts = new ArrayList&lt;Account&gt;();</span>
+      // just 4 accounts for testing
+      // parameter pembuatan akun {account number, pin, available balance, deposito, role, status account (actif/terblokir)}
+<span class="fc" id="L13">      accounts.add(new Account(1234, 4321, 1000.0, 1200.0, 2, 1)); // Nasabah perorangan, active, total saldo 2200</span>
+<span class="fc" id="L14">      accounts.add(new Account(8765, 5678, 200.0, 0.0, 2, 1)); // Nasabah perorangan, active, total saldo 200</span>
+<span class="fc" id="L15">      accounts.add(new Account(1235, 5321, 500.0, 500.0, 2, 1)); // Nasabah perorangan, active, total saldo 1000</span>
+<span class="fc" id="L16">      accounts.add(new Account(2205, 2205, 1500.0, 0.0, 2, 0)); // Nasabah perorangan, block, total saldo 1500</span>
+<span class="fc" id="L17">      accounts.add(new Account(1111, 1234, 0, 0, 1, 1)); // Admin, active</span>
+      
+      //public Account(int theAccountNumber, int thePIN, 
+    	      //double theAvailableBalance, double theTotalBalance)
+<span class="fc" id="L21">   }</span>
+   
+   
+   public Account[] getDataAllAccount() {
+<span class="nc" id="L25">	   return accounts.toArray(new Account[accounts.size()]);</span>
+   }
+   
+   public void addAccount(Account newAccount) {
+<span class="fc" id="L29">	   accounts.add(newAccount);</span>
+<span class="fc" id="L30">   }</span>
+
+   public Account[] getListAccountByRoleStatus(int roleID, int status) {
+<span class="nc" id="L33">	   ArrayList &lt;Account&gt; result = new ArrayList();</span>
+	   int sum, idx;
+	      
+<span class="nc" id="L36">	   idx = 0;</span>
+<span class="nc" id="L37">	   sum = 0;</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">	   while (idx&lt;accounts.size()) {</span>
+<span class="nc bnc" id="L39" title="All 4 branches missed.">		   if(accounts.get(idx).getRoleUser() == roleID &amp;&amp; accounts.get(idx).getStatusActive() == status) {</span>
+			   // add account role to list account
+<span class="nc" id="L41">			   result.add(accounts.get(idx));</span>
+		   }
+<span class="nc" id="L43">		   idx++;</span>
+	   }
+<span class="nc" id="L45">	   return result.toArray(new Account[result.size()]);     </span>
+   } 
+   
+   private Account getAccount(int accountNumber) {
+      int i;
+      boolean ketemu;
+<span class="fc" id="L51">      Account accData = null;</span>
+      
+<span class="fc" id="L53">      i = 0;</span>
+<span class="fc" id="L54">      ketemu = false;</span>
+<span class="fc bfc" id="L55" title="All 4 branches covered.">      while (i&lt;accounts.size() &amp;&amp; !ketemu) {</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">    	  if(accounts.get(i).getAccountNumber() == accountNumber) {</span>
+    		// akun ATM terdaftar dalam mesin ATM
+<span class="fc" id="L58">    		  ketemu = true;</span>
+<span class="fc" id="L59">			  accData = accounts.get(i);</span>
+    	  }
+<span class="fc" id="L61">		i++;</span>
+	  }
+<span class="fc" id="L63">      return accData; </span>
+      
+   } 
+   
+   public int authenticateUser(int userAccountNumber, int userPIN) {
+      // attempt to retrieve the account with the account number
+<span class="nc" id="L69">      Account userAccount = getAccount(userAccountNumber);</span>
+
+      // if account exists, return result of Account method validatePIN
+<span class="nc bnc" id="L72" title="All 2 branches missed.">      if (userAccount != null) {</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">    	  if (userAccount.validatePIN(userPIN)) {</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">    		  if(userAccount.isAccActive()) {</span>
+<span class="nc" id="L75">    			  return LOGIN_SUCCESS;  </span>
+    		  }else {
+<span class="nc" id="L77">    			return LOGIN_ERROR_ACC_BLOCKED;  </span>
+    		  }
+    	  }else {
+<span class="nc" id="L80">    		  return LOGIN_ERROR_INVALID_PIN;</span>
+    	  }
+      }else {
+<span class="nc" id="L83">    	  return LOGIN_ERROR_ACC_NOT_REGISTERED;  </span>
+      }
+   } 
+
+   public boolean isAccountExist(int userAccountNumber) {
+<span class="nc" id="L88">	   Account userAccount = getAccount(userAccountNumber);</span>
+	   // if account exists, return true
+<span class="nc bnc" id="L90" title="All 2 branches missed.">	   if (userAccount != null) {</span>
+<span class="nc" id="L91">		   return true;</span>
+	   }else {
+<span class="nc" id="L93">		   return false; // account number not found, so return false</span>
+	   }
+   }
+   
+   public int getRoleAccount(int userAccountNumber) {
+<span class="nc" id="L98">	   return getAccount(userAccountNumber).getRoleUser();</span>
+   }
+   
+   public double getAvailableBalance(int userAccountNumber) {
+<span class="fc" id="L102">      return getAccount(userAccountNumber).getAvailableBalance();</span>
+   } 
+
+   public double getTotalBalance(int userAccountNumber) {
+<span class="nc" id="L106">      return getAccount(userAccountNumber).getTotalBalance();</span>
+   } 
+
+   public void credit(int userAccountNumber, double amount) {
+<span class="fc" id="L110">      getAccount(userAccountNumber).credit(amount);</span>
+<span class="fc" id="L111">   }</span>
+
+   public void debit(int userAccountNumber, double amount) {
+<span class="nc" id="L114">      getAccount(userAccountNumber).debit(amount);</span>
+<span class="nc" id="L115">   } </span>
+   
+   public void blockingAcc(int userAccountNumber) {
+<span class="nc" id="L118">	   getAccount(userAccountNumber).setStatusBlocked();</span>
+<span class="nc" id="L119">   }</span>
+   
+   public void unblockingAcc(int userAccountNumber) {
+<span class="nc" id="L122">	   getAccount(userAccountNumber).setStatusActive();</span>
+<span class="nc" id="L123">   }</span>
+   
+   public boolean isAccountActive(int userAccountNumber) {
+<span class="nc" id="L126">	   return (getAccount(userAccountNumber).isAccActive());</span>
+   }
+   
+   public boolean isAccountBlocked(int userAccountNumber) {
+<span class="nc" id="L130">	   return (getAccount(userAccountNumber).isAccBlocked());</span>
+   }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ATM.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MavenATMv2</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">ATM.java</span></div><h1>ATM.java</h1><pre class="source lang-java linenums">package controller;
+
+import static model.Constants.*;
+
+import model.AddAccount;
+import model.BalanceInquiry;
+import model.BankDatabase;
+import model.BlockAccount;
+import model.UnBlockAccount;
+import model.CashDispenser;
+import model.Deposit;
+import model.DepositSlot;
+import model.Transaction;
+import model.Transfer;
+import model.ViewAccount;
+import model.Withdrawal;
+import view.Keypad;
+import view.Screen;
+
+public class ATM {
+   private int userAuthenticatedStatus; // whether user is authenticated
+   private int currentAccountNumber; // current user's account number
+   private Screen screen; // ATM's screen
+   private Keypad keypad; // ATM's keypad
+   private CashDispenser cashDispenser; // ATM's cash dispenser
+
+   private BankDatabase bankDatabase; // account information database
+   private DepositSlot depositSlot; // deposit atm slot
+
+
+   // no-argument ATM constructor initializes instance variables
+<span class="nc" id="L32">   public ATM() {</span>
+<span class="nc" id="L33">	  userAuthenticatedStatus = 0; // user is not authenticated to start</span>
+<span class="nc" id="L34">      currentAccountNumber = 0; // no current account number to start</span>
+<span class="nc" id="L35">      screen = new Screen(); // create screen</span>
+<span class="nc" id="L36">      keypad = new Keypad(); // create keypad </span>
+<span class="nc" id="L37">      cashDispenser = new CashDispenser(); // create cash dispenser</span>
+<span class="nc" id="L38">      bankDatabase = new BankDatabase(); // create acct info database</span>
+<span class="nc" id="L39">   }</span>
+
+   // start ATM 
+   public void run() {
+      // welcome and authenticate user; perform transactions
+      while (true) {
+         // loop while user is not yet authenticated
+<span class="nc bnc" id="L46" title="All 2 branches missed.">         while (userAuthenticatedStatus != LOGIN_SUCCESS) {</span>
+<span class="nc" id="L47">            screen.displayMessageLine(&quot;\nWelcome!&quot;);       </span>
+<span class="nc" id="L48">            authenticateUser(); // authenticate user</span>
+         }
+<span class="nc bnc" id="L50" title="All 4 branches missed.">         switch (bankDatabase.getRoleAccount(currentAccountNumber)) {</span>
+         	case ROLE_ADMIN : // menu admin
+<span class="nc" id="L52">         		performTransactionsAdmin();</span>
+<span class="nc" id="L53">         		break;</span>
+         	case ROLE_INDIVIDUAL_CUSTOMER : // menu nasabah perorangan
+<span class="nc" id="L55">         		performTransactionsCustomer(); // user is now authenticated</span>
+<span class="nc" id="L56">         		break;</span>
+         	case ROLE_COMPANY_CUSTOMER : // menu nasabah perusahaan
+<span class="nc" id="L58">         		performTransactionsCustomer(); // user is now authenticated</span>
+         		break;
+         }
+<span class="nc" id="L61">         userAuthenticatedStatus = 0; // reset before next ATM session</span>
+<span class="nc" id="L62">         currentAccountNumber = 0; // reset before next ATM session</span>
+<span class="nc" id="L63">         screen.displayMessageLine(&quot;\nThank you! Goodbye!&quot;);</span>
+      }
+   }
+
+   // attempts to authenticate user against database
+   private void authenticateUser() {
+<span class="nc" id="L69">      screen.displayMessage(&quot;\nPlease Enter Your Account Number : &quot;);</span>
+<span class="nc" id="L70">      int accountNumber = keypad.getInput(); // input account number</span>
+<span class="nc" id="L71">      screen.displayMessage(&quot;\nEnter Your PIN : &quot;); // prompt for PIN</span>
+<span class="nc" id="L72">      int pin = keypad.getInput(); // input PIN</span>
+      
+      // set userAuthenticated to boolean value returned by database
+<span class="nc" id="L75">      userAuthenticatedStatus = </span>
+<span class="nc" id="L76">         bankDatabase.authenticateUser(accountNumber, pin);</span>
+      
+      // check whether authentication succeeded
+<span class="nc bnc" id="L79" title="All 2 branches missed.">      if (userAuthenticatedStatus == LOGIN_SUCCESS) {</span>
+<span class="nc" id="L80">         currentAccountNumber = accountNumber; // save user's account #</span>
+      } 
+      else {
+<span class="nc bnc" id="L83" title="All 4 branches missed.">    	  if(userAuthenticatedStatus == LOGIN_ERROR_ACC_NOT_REGISTERED ||</span>
+    			  userAuthenticatedStatus == LOGIN_ERROR_INVALID_PIN) {
+<span class="nc" id="L85">    		  screen.displayMessageLine(&quot;Invalid account number or PIN. Please try again!&quot;);</span>
+    	  }else {
+<span class="nc" id="L87">    		  screen.displayMessageLine(&quot;Destination account has been blocked&quot;);</span>
+    	  }
+      } 
+<span class="nc" id="L90">   } </span>
+
+   // display the main menu and perform transactions for admin
+   private void performTransactionsAdmin() {
+	   // local variable to store transaction currently being processed
+<span class="nc" id="L95">	   Transaction currentTransaction = null;</span>
+<span class="nc" id="L96">	   TransactionController currentTransactionController = null;</span>
+	   
+<span class="nc" id="L98">	   boolean userExited = false; // user has not chosen to exit</span>
+	   // cashdispenser
+<span class="nc" id="L100">	   CashDispenserController currentDispenserController = new CashDispenserController(cashDispenser, keypad, screen);</span>
+
+	   // loop while user has not chosen option to exit system
+<span class="nc bnc" id="L103" title="All 2 branches missed.">	   while (!userExited) {</span>
+		   // show main menu and get user selection
+<span class="nc" id="L105">		   int mainMenuSelection = displayMainMenuAdmin();</span>
+		   
+<span class="nc bnc" id="L107" title="All 8 branches missed.">		   switch(mainMenuSelection) {</span>
+		   		case UNBLOCK_ACCOUNT_MENU:
+<span class="nc" id="L109">		   			currentTransaction = createTransactionAdmin(mainMenuSelection);</span>
+<span class="nc" id="L110">		   			currentTransactionController = new UnBlockAccountController(currentTransaction, keypad, screen);</span>
+<span class="nc" id="L111">	                currentTransactionController.run(); // execute transaction</span>
+<span class="nc" id="L112">		   			break;</span>
+		   		case BLOCK_ACCOUNT_MENU:
+<span class="nc" id="L114">		   			currentTransaction = createTransactionAdmin(mainMenuSelection);</span>
+<span class="nc" id="L115">		   			currentTransactionController = new BlockAccountController(currentTransaction, keypad, screen);</span>
+<span class="nc" id="L116">	                currentTransactionController.run(); // execute transaction</span>
+<span class="nc" id="L117">		   			break;</span>
+		   		case VIEW_CASHDISPENSER_MENU :
+<span class="nc" id="L119">		   			currentDispenserController.displayCashDispenser();</span>
+<span class="nc" id="L120">		   			break;</span>
+		   		case ADD_CASHDISPENSER_MENU :
+<span class="nc" id="L122">		   			currentDispenserController.addCashDispenser();</span>
+<span class="nc" id="L123">		   			break;</span>
+		   		case ADD_ACCOUNT_MENU :
+<span class="nc" id="L125">		   			currentTransaction = createTransactionAdmin(mainMenuSelection);</span>
+<span class="nc" id="L126">		   			currentTransactionController = new AddAccountController(currentTransaction, keypad, screen);</span>
+<span class="nc" id="L127">	                currentTransactionController.run(); // execute transaction</span>
+<span class="nc" id="L128">		   			break;</span>
+		   		case VIEW_ACCOUNT_MENU:
+<span class="nc" id="L130">		   			currentTransaction = createTransactionAdmin(mainMenuSelection);</span>
+<span class="nc" id="L131">		   			currentTransactionController = new ViewAccountController(currentTransaction, keypad, screen);</span>
+<span class="nc" id="L132">	                currentTransactionController.run(); // execute transaction</span>
+<span class="nc" id="L133">		   			break;</span>
+		   		case EXIT_ADMIN_MENU: // user chose to terminate session
+<span class="nc" id="L135">		   			screen.displayMessageLine(&quot;\nExiting the system...&quot;);</span>
+<span class="nc" id="L136">		   			userExited = true; // this ATM session should end</span>
+<span class="nc" id="L137">		   			break;</span>
+		   		default: // invalid input menu option 
+<span class="nc" id="L139">		   			screen.displayMessageLine(&quot;\nYou did not enter a valid selection. Try again.&quot;);</span>
+		   			break;
+		   }
+		   
+<span class="nc" id="L143">	   }</span>
+
+<span class="nc" id="L145">   }</span>
+   // display the main menu and perform transactions for individual customer
+   private void performTransactionsCustomer() {
+      // local variable to store transaction currently being processed
+<span class="nc" id="L149">      Transaction currentTransaction = null;</span>
+<span class="nc" id="L150">      TransactionController currentTransactionController = null;</span>
+      
+<span class="nc" id="L152">      boolean userExited = false; // user has not chosen to exit</span>
+
+      // loop while user has not chosen option to exit system
+<span class="nc bnc" id="L155" title="All 2 branches missed.">      while (!userExited) {</span>
+         // show main menu and get user selection
+<span class="nc" id="L157">         int mainMenuSelection = displayMainMenuCustomer();</span>
+
+         // decide how to proceed based on user's menu selection
+<span class="nc bnc" id="L160" title="All 5 branches missed.">         switch (mainMenuSelection) {</span>
+            // user chose to perform one of three transaction types
+         
+            case BALANCE_INQUIRY: // user chose to view balance        
+               // initialize as new object of chosen type
+<span class="nc" id="L165">               currentTransaction = createTransactionCustomer(mainMenuSelection);</span>
+<span class="nc" id="L166">               currentTransactionController = new BalanceInquiryController(currentTransaction, keypad, screen);</span>
+<span class="nc" id="L167">               currentTransactionController.run(); // execute transaction</span>
+<span class="nc" id="L168">               break;</span>
+               
+            case WITHDRAWAL: // user chose to balance taking
+            	  // initialize as new object of chosen type
+<span class="nc" id="L172">                currentTransaction = createTransactionCustomer(mainMenuSelection);</span>
+<span class="nc" id="L173">                currentTransactionController = new WithdrawalController(currentTransaction, keypad, screen);</span>
+<span class="nc" id="L174">                currentTransactionController.run(); // execute transaction</span>
+<span class="nc" id="L175">                break; </span>
+                
+            case TRANSFER: // user chose to add balance
+<span class="nc" id="L178">                currentTransaction = createTransactionCustomer(mainMenuSelection);</span>
+<span class="nc" id="L179">                currentTransactionController = new TransferController(currentTransaction, keypad, screen);</span>
+<span class="nc" id="L180">                currentTransactionController.run(); // execute transaction</span>
+<span class="nc" id="L181">                break; </span>
+                
+            
+            case EXIT_CUSTOMER_MENU: // user chose to terminate session
+<span class="nc" id="L185">               screen.displayMessageLine(&quot;\nExiting the system...&quot;);</span>
+<span class="nc" id="L186">               userExited = true; // this ATM session should end</span>
+<span class="nc" id="L187">               break;</span>
+               
+            default: // 
+<span class="nc" id="L190">               screen.displayMessageLine(&quot;\nYou did not enter a valid selection. Try again.&quot;);</span>
+               break;
+         }
+<span class="nc" id="L193">      } </span>
+<span class="nc" id="L194">   } </span>
+
+   // display the main menu customer and return an input selection
+   private int displayMainMenuCustomer() {
+<span class="nc" id="L198">      screen.displayMessageLine(&quot;\nMain menu nasabah:&quot;);</span>
+<span class="nc" id="L199">      screen.displayMessageLine(&quot;1 - View My Balance&quot;);</span>
+<span class="nc" id="L200">      screen.displayMessageLine(&quot;2 - Withdraw Cash&quot;);</span>
+<span class="nc" id="L201">      screen.displayMessageLine(&quot;3 - Transfer Amount&quot;);</span>
+<span class="nc" id="L202">      screen.displayMessageLine(&quot;4 - Exit\n&quot;);</span>
+<span class="nc" id="L203">      screen.displayMessage(&quot;Enter a choice: &quot;);</span>
+<span class="nc" id="L204">      return keypad.getInput(); // return user's selection</span>
+   }
+   
+   // display the main menu admin and return an input selection
+   private int displayMainMenuAdmin() {
+<span class="nc" id="L209">      screen.displayMessageLine(&quot;\nMain menu admin:&quot;);</span>
+<span class="nc" id="L210">      screen.displayMessageLine(&quot;1 - Unblock Account Number&quot;);</span>
+<span class="nc" id="L211">      screen.displayMessageLine(&quot;2 - Block Account Number&quot;);</span>
+<span class="nc" id="L212">      screen.displayMessageLine(&quot;3 - View Cash Dispenser Information&quot;);</span>
+<span class="nc" id="L213">      screen.displayMessageLine(&quot;4 - Add Cash Dispenser&quot;);</span>
+<span class="nc" id="L214">      screen.displayMessageLine(&quot;5 - Add Account Number&quot;);</span>
+<span class="nc" id="L215">      screen.displayMessageLine(&quot;6 - View Account Number&quot;);</span>
+<span class="nc" id="L216">      screen.displayMessageLine(&quot;7 - Exit\n&quot;);</span>
+<span class="nc" id="L217">      screen.displayMessage(&quot;Enter a choice: &quot;);</span>
+<span class="nc" id="L218">      return keypad.getInput(); // return user's selection</span>
+   }
+         
+   private Transaction createTransactionCustomer(int type) {
+<span class="nc" id="L222">      Transaction temp = null; </span>
+          
+<span class="nc bnc" id="L224" title="All 4 branches missed.">      switch (type) {</span>
+         case BALANCE_INQUIRY: 
+<span class="nc" id="L226">            temp = new BalanceInquiry(currentAccountNumber, bankDatabase);</span>
+<span class="nc" id="L227">            break;</span>
+         case WITHDRAWAL: 
+<span class="nc" id="L229">             temp = new Withdrawal(currentAccountNumber, bankDatabase, cashDispenser);</span>
+<span class="nc" id="L230">             break;</span>
+         case TRANSFER: 
+<span class="nc" id="L232">             temp = new Transfer(currentAccountNumber, bankDatabase); </span>
+             break;
+      }
+
+<span class="nc" id="L236">      return temp;</span>
+   }
+   
+   private Transaction createTransactionAdmin(int type) {
+<span class="nc" id="L240">	      Transaction temp = null; </span>
+	          
+<span class="nc bnc" id="L242" title="All 5 branches missed.">	      switch (type) {</span>
+	      case UNBLOCK_ACCOUNT_MENU: 
+<span class="nc" id="L244">	             temp = new UnBlockAccount(bankDatabase); </span>
+<span class="nc" id="L245">	             break;   </span>
+	      case BLOCK_ACCOUNT_MENU: 
+<span class="nc" id="L247">	             temp = new BlockAccount(bankDatabase); </span>
+<span class="nc" id="L248">	             break;</span>
+	      case VIEW_ACCOUNT_MENU: 
+<span class="nc" id="L250">	             temp = new ViewAccount(bankDatabase); </span>
+<span class="nc" id="L251">	             break;</span>
+	      case ADD_ACCOUNT_MENU: 
+<span class="nc" id="L253">	             temp = new AddAccount(bankDatabase); </span>
+	             break;
+	      }
+
+<span class="nc" id="L257">	      return temp;</span>
+	   } 
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

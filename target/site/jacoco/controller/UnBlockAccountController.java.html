@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UnBlockAccountController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MavenATMv2</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">UnBlockAccountController.java</span></div><h1>UnBlockAccountController.java</h1><pre class="source lang-java linenums">package controller;
+
+import model.UnBlockAccount;
+
+import static model.Constants.*;
+
+import model.Transaction;
+import view.Keypad;
+import view.Screen;
+
+public class UnBlockAccountController extends TransactionController{
+	private int statusBlock; //status transaction process
+	private int accUnBlock; // account number which blocked
+
+	public UnBlockAccountController(Transaction theTransaction, Keypad theKeypad, Screen theScreen) {
+<span class="nc" id="L16">		super(theTransaction, theKeypad, theScreen);</span>
+		// TODO Auto-generated constructor stub
+<span class="nc" id="L18">	}</span>
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+<span class="nc" id="L23">		UnBlockAccount transaction = (UnBlockAccount) getTransaction();</span>
+<span class="nc" id="L24">		Screen screen = getScreen(); // get screen reference</span>
+		int statusProcess;
+		
+		 // loop while no valid choice has been made on unblock account option menu
+		do {
+<span class="nc" id="L29">			displayMenuOfAccounts();</span>
+<span class="nc bnc" id="L30" title="All 2 branches missed.">			 while (statusBlock &lt;= 0) {</span>
+<span class="nc bnc" id="L31" title="All 4 branches missed.">				 switch(statusBlock) {</span>
+				 	case UNBLOCK_ACCOUNT_ERROR_INPUT_DIGIT:
+<span class="nc" id="L33">				 		screen.displayMessageLine(&quot;The number of digit account number must be equal 4 digits&quot;);</span>
+<span class="nc" id="L34">				 		break;</span>
+				 	case UNBLOCK_ACCOUNT_ERROR_POSITIVE_VALUE:
+<span class="nc" id="L36">				 		screen.displayMessageLine(&quot;value account number not valid, must be positif value&quot;);</span>
+<span class="nc" id="L37">				 		break;</span>
+				 	case UNBLOCK_ACCOUNT_ERROR_INPUT_MENU :
+<span class="nc" id="L39">						screen.displayMessageLine(&quot;Invalid selection. Try again!&quot;);</span>
+						break;
+				 }
+<span class="nc" id="L42">				 displayMenuOfAccounts();</span>
+			 }
+			 
+<span class="nc" id="L45">			 transaction.setAccNumUnBlock(accUnBlock);</span>
+<span class="nc" id="L46">			 transaction.setStatusBlock(statusBlock);</span>
+<span class="nc" id="L47">			 statusProcess = transaction.execute();</span>
+<span class="nc bnc" id="L48" title="All 5 branches missed.">			 switch (statusProcess) {</span>
+					case ACCOUNT_NOT_REGISTERED:
+<span class="nc" id="L50">						screen.displayMessageLine(&quot;Account number not registered in system&quot;);</span>
+<span class="nc" id="L51">						break;</span>
+					case UNBLOCK_ACCOUNT_ERROR_NOT_BLOCKED:
+<span class="nc" id="L53">						screen.displayMessageLine(&quot;Account number has not been blocked&quot;);</span>
+<span class="nc" id="L54">						break;</span>
+					case UNBLOCK_ACCOUNT_CANCELED :
+<span class="nc" id="L56">						screen.displayMessageLine(&quot;You canceled transaction&quot;);</span>
+<span class="nc" id="L57">						break;</span>
+					case UNBLOCK_SUCCESSFUL :
+<span class="nc" id="L59">						screen.displayMessageLine(&quot;Account number has been activated&quot;);</span>
+						break;	
+				}
+<span class="nc bnc" id="L62" title="All 2 branches missed.">			}while(statusProcess!=UNBLOCK_ACCOUNT_CANCELED);		</span>
+		
+<span class="nc" id="L64">	}</span>
+
+	private void displayMenuOfAccounts() {
+		// TODO Auto-generated method stub
+		 int inputSheet;
+<span class="nc" id="L69">		 statusBlock = 0;</span>
+<span class="nc" id="L70">		 accUnBlock = 0;</span>
+		      
+		 // display the add cash menu
+<span class="nc" id="L73">		 screen.displayMessageLine(&quot;\nUnblock Account Menu:&quot;);</span>
+<span class="nc" id="L74">		 screen.displayMessageLine(&quot;1 - Input Transaction&quot;);</span>
+<span class="nc" id="L75">		 screen.displayMessageLine(&quot;2 - Cancel Transaction&quot;);</span>
+<span class="nc" id="L76">		 screen.displayMessage(&quot;\nChoose option menu: &quot;);</span>
+
+<span class="nc" id="L78">		 int input = keypad.getInput(); // get user input through keypad</span>
+		 // determine how to proceed based on the input value
+<span class="nc bnc" id="L80" title="All 3 branches missed.">		 switch (input) {</span>
+		 	case 1: // do unblock account number process
+<span class="nc" id="L82">		 		screen.displayMessage(&quot;Input account number:&quot;);</span>
+<span class="nc" id="L83">				inputSheet = keypad.getInput(); // get user input through keypad</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">				if (!isValidAccountNumberDigit(inputSheet)) {  // cek jumlah digit account number apakah 4? (V1)</span>
+<span class="nc" id="L85">					statusBlock = UNBLOCK_ACCOUNT_ERROR_INPUT_DIGIT;</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">	        	}else if (!isValidAccountNumberValue(inputSheet)) { // cek account number bernilai positif (V2)</span>
+<span class="nc" id="L87">	        		statusBlock = UNBLOCK_ACCOUNT_ERROR_POSITIVE_VALUE;</span>
+				}else {
+<span class="nc" id="L89">					statusBlock = VALIDATION_UNBLOCK_SUCCESSFULL;</span>
+<span class="nc" id="L90">					accUnBlock = inputSheet;</span>
+	        	}
+<span class="nc" id="L92">		 		break;       </span>
+		 	case UNBLOCK_ACCOUNT_CANCELED: // the user chose to cancel
+<span class="nc" id="L94">		 		statusBlock = UNBLOCK_ACCOUNT_CANCELED; // save user's choice</span>
+<span class="nc" id="L95">		 		break;</span>
+		 	default: // the user did not enter a value from 1-2
+<span class="nc" id="L97">		 		statusBlock = UNBLOCK_ACCOUNT_ERROR_INPUT_MENU;</span>
+			} 
+<span class="nc" id="L99">	 }</span>
+	
+	 private boolean isValidAccountNumberValue(int AccountNumber) {
+<span class="nc bnc" id="L102" title="All 2 branches missed.">		 if(AccountNumber &gt; 0) {</span>
+<span class="nc" id="L103">			 return  true;</span>
+		 }else {
+<span class="nc" id="L105">			 return false;</span>
+		 }
+	}
+	 
+	 private boolean isValidAccountNumberDigit(int AccountNumber) {
+<span class="nc" id="L110">		 int digitValue = 0;</span>
+<span class="nc" id="L111">		 AccountNumber = Math.abs(AccountNumber);</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">		 while (AccountNumber&gt;0) {</span>
+<span class="nc" id="L113">			 AccountNumber = AccountNumber / 10;</span>
+<span class="nc" id="L114">			 digitValue = digitValue + 1;</span>
+		 }
+<span class="nc bnc" id="L116" title="All 2 branches missed.">		 if(digitValue == 4) {</span>
+<span class="nc" id="L117">			 return  true;</span>
+		 }else {
+<span class="nc" id="L119">			 return false;</span>
+		 }
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>
