@@ -1,6 +1,0 @@
-projectKey=com:MavenATMv2
-serverUrl=http://localhost:9000
-serverVersion=8.9.1.44547
-dashboardUrl=http://localhost:9000/dashboard?id=com%3AMavenATMv2
-ceTaskId=AXpzYXksY-xTE5Q6m9U0
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AXpzYXksY-xTE5Q6m9U0

@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: WithdrawalControllerTest
--------------------------------------------------------------------------------
-Tests run: 33, Failures: 0, Errors: 0, Skipped: 11, Time elapsed: 0.034 s - in WithdrawalControllerTest
