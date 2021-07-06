@@ -501,6 +501,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.4.10
          * Author : Evan Lokajaya
+         * Expected Result : transaksi gagal karena available balance tidak mencukupi
          */
     	InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "100").getBytes());
         System.setIn(input);
@@ -530,6 +531,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.4.11
          * Author : Evan Lokajaya
+         * Expected Result : transaksi berhasil, available balance bernilai $110 dan cash dispenser bersisa 1 lembar
          */
     	InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "100").getBytes());
         System.setIn(input);
@@ -562,6 +564,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.4.12
          * Author : Evan Lokajaya
+         * Expected Result : transaksi gagal karena available balance tidak mencukupi
          */
     	InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "100").getBytes());
         System.setIn(input);
@@ -592,6 +595,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.4.13
          * Author : Evan Lokajaya
+         * Expected Result : transaksi berhasil, available balance bernilai $110 dan cash dispenser bersisa 1 lembar
          */
     	InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "100").getBytes());
         System.setIn(input);
@@ -624,6 +628,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.4.14
          * Author : Zara Veda
+ 	 * Expected Result : transaksi gagal karena available balance tidak mencukupi
          */
     	InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "100").getBytes());
         System.setIn(input);
@@ -652,6 +657,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.4.15
          * Author : Zara Veda
+	 * Expected Result : transaksi gagal karena available balance tidak mencukupi
          */
     	InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "100").getBytes());
         System.setIn(input);
@@ -681,6 +687,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.4.16
          * Author : Zara Veda
+	 * Expected Result : transaksi berhasil, available balance tersisa $110, dan sisa cash dispenser 1 lembar
          */
     	InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "100").getBytes());
         System.setIn(input);
@@ -711,6 +718,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.4.17
          * Author : Zara Veda
+	 * Expected Result : transaksi berhasil, available balance tersisa $110, dan sisa cash dispenser 1 lembar
          */
     	InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "100").getBytes());
         System.setIn(input);
