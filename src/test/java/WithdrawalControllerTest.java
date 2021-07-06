@@ -54,14 +54,15 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.1.1
          * Author : Evan Lokajaya
+         * Expected Result : menampilkan menu sesuai desain tampilan
          */
-    	InputStream input = new ByteArrayInputStream("7".getBytes());
+        InputStream input = new ByteArrayInputStream("7".getBytes());
         System.setIn(input);
         
         Keypad keypad = new Keypad();
         Screen screen = new Screen();
-    	BankDatabase bankdb = new BankDatabase();
-    	CashDispenser cashDispenser = new CashDispenser();
+        BankDatabase bankdb = new BankDatabase();
+        CashDispenser cashDispenser = new CashDispenser();
 
         Withdrawal transaction = new Withdrawal(1234, bankdb, cashDispenser);
         WithdrawalController wdController = new WithdrawalController(transaction, keypad, screen);
@@ -81,15 +82,16 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.3.1
          * Description : Mencoba method run pada cash withdrawal controller dengan input dibawah batas bawah
+         * Expected Result : Gagal memilih menu
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream("0".getBytes());
         System.setIn(input);
         Keypad keypad = new Keypad();
-    	Screen screen = new Screen();
-    	BankDatabase bankdb = new BankDatabase();
-    	Transaction transaction = null;
-    	WithdrawalController wdController = new WithdrawalController(transaction, keypad, screen);
+        Screen screen = new Screen();
+        BankDatabase bankdb = new BankDatabase();
+        Transaction transaction = null;
+        WithdrawalController wdController = new WithdrawalController(transaction, keypad, screen);
 
         assertEquals(wdController.displayMenuOfAmounts(), constant.WITHDRAWAL_ERROR_INPUT_MENU);
     }
@@ -100,6 +102,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.3.2
          * Description : Mencoba method run pada cash withdrawal controller dengan input diatas batas atas
+         * Expected Result : Gagal memilih menu
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream("8".getBytes());
@@ -119,6 +122,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.3.3
          * Description : Mencoba method run pada cash withdrawal controller dengan input dibawah batas bawah
+         * Expected Result : Gagal memilih menu
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream("-3".getBytes());
@@ -138,6 +142,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.3.4
          * Description : Mencoba method run pada cash withdrawal controller dengan input diatas batas atas
+         * Expected Result : Gagal memilih menu
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream("9".getBytes());
@@ -157,6 +162,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.3.5
          * Description : Mencoba method run pada cash withdrawal controller dengan input 7
+         * Expected Result : Proses penarikan dibatalkan
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream("7".getBytes());
@@ -176,6 +182,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.3.6
          * Description : Mencoba method run pada cash withdrawal controller dengan input 1
+         * Expected Result : Proses withdrawal berhasil dan available balance berkurang $20
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream("1".getBytes());
@@ -195,6 +202,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.3.7
          * Description : Mencoba method run pada cash withdrawal controller dengan input 2
+         * Expected Result : Proses withdrawal berhasil dan available balance berkurang $40
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream("2".getBytes());
@@ -214,6 +222,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.3.8
          * Description : Mencoba method run pada cash withdrawal controller dengan input 3
+         * Expected Result : Proses withdrawal berhasil dan available balance berkurang $60
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream("3".getBytes());
@@ -233,6 +242,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.3.9
          * Description : Mencoba method run pada cash withdrawal controller dengan input 4
+         * Expected Result : Proses withdrawal berhasil dan available balance berkurang $100
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream("4".getBytes());
@@ -252,6 +262,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.3.10
          * Description : Mencoba method run pada cash withdrawal controller dengan input 5
+         * Expected Result : Proses withdrawal berhasil dan available balance berkurang $200
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream("5".getBytes());
@@ -271,6 +282,7 @@ public class WithdrawalControllerTest {
         /**
          * Test Case 4.3.11
          * Description : Menguji menu other amount pada cash withdrawal
+         * Expected Result : Ditampilkan menu input, proses penarikan berhasil, dan available balance berkurang sebanyak 100
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "100").getBytes());
@@ -296,7 +308,8 @@ public class WithdrawalControllerTest {
     {
         /**
          * Test Case 4.4.1
-         * Description : Menguji hal;aman utama other amount cash withdrawal
+         * Description : Menguji halaman utama other amount cash withdrawal
+         * Expected Result : Menampilkan halaman other amount cash sesuai desain
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "100").getBytes());
@@ -323,6 +336,7 @@ public class WithdrawalControllerTest {
          * Test Case 4.4.2
          * Description : Mencoba method run pada cash withdrawal controller dengan input other amount
          * Input amount dibawah range yang disediakan
+         * Expected Result : Penarikan gagal
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "-20").getBytes());
@@ -343,6 +357,7 @@ public class WithdrawalControllerTest {
          * Test Case 4.4.3
          * Description : Mencoba method run pada cash withdrawal controller dengan input other amount
          * Input amount dalam range yang disediakan namun bukan kelipatan 20
+         * Expected Result : Proses penarikan gagal
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "35").getBytes());
@@ -364,6 +379,7 @@ public class WithdrawalControllerTest {
          * Test Case 4.4.4
          * Description : Mencoba method run pada cash withdrawal controller dengan input other amount
          * Input amount dibawah batas yang didefinisikan
+         * Expected Result : Penarikan gagal
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "0").getBytes());
@@ -384,6 +400,7 @@ public class WithdrawalControllerTest {
          * Test Case 4.4.5
          * Description : Mencoba method run pada cash withdrawal controller dengan input other amount
          * Input amount diatas range yang disediakan
+         * Expected Result : Proses penarikan gagal
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "520").getBytes());
@@ -404,6 +421,7 @@ public class WithdrawalControllerTest {
          * Test Case 4.4.6
          * Description : Mencoba method run pada cash withdrawal controller dengan input other amount
          * Input amount tepat di batas bawah
+         * Expected Result : Penarikan gagal, inputan nilai nominal uang harus selain $20, $40, $60, $100 dan $200
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "20").getBytes());
@@ -424,6 +442,7 @@ public class WithdrawalControllerTest {
          * Test Case 4.4.7
          * Description : Mencoba method run pada cash withdrawal controller dengan input other amount
          * Input amount tepat di batas bawah
+         * Expected Result : Penarikan berhasil dengan available berkurang sebanyak $500
          * Author : Evan Lokajaya
          */
         InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "500").getBytes());
@@ -442,6 +461,7 @@ public class WithdrawalControllerTest {
     {
         /**
          * Test Case 4.4.8
+         * Expected Result : Penarikan gagal karena cash dispenser tidak mencukupi
          * Author : Evan Lokajaya
          */
     	InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "100").getBytes());
@@ -471,15 +491,16 @@ public class WithdrawalControllerTest {
     {
         /**
          * Test Case 4.4.9
+         * Expected Result : Penarikan gagal karena cash dispenser tidak mencukupi
          * Author : Evan Lokajaya
          */
-    	InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "100").getBytes());
+        InputStream input = new ByteArrayInputStream(("6" + System.lineSeparator() + "100").getBytes());
         System.setIn(input);
         
         Keypad keypad = new Keypad();
         Screen screen = new Screen();
-    	BankDatabase bankdb = new BankDatabase();
-    	CashDispenser cashDispenser = new CashDispenser();
+        BankDatabase bankdb = new BankDatabase();
+        CashDispenser cashDispenser = new CashDispenser();
 
         //Set Up the PreConditions
         bankdb.addAccount(new Account(4444, 4444, 210, 0, 2, 1));
